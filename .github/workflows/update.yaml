@@ -3,12 +3,8 @@
 # and https://github.com/dependabot/fetch-metadata
 name: Auto-merge
 
-on:
-  workflow_run:
-    types:
-      - completed
-    workflows:
-      - 'Tests'
+# `pull_request_target` means this uses code in the base branch, not the PR.
+on: pull_request_target
 
 # Dependabot PRs' tokens have read permissions by default and thus we must enable write permissions.
 permissions:
@@ -18,7 +14,7 @@ permissions:
 jobs:
   dependencies:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.user.login == 'dependabot[bot]'
+    if: github.actor == 'dependabot[bot]'
 
     steps:
       - name: Fetch PR metadata
@@ -26,6 +22,16 @@ jobs:
         uses: dependabot/fetch-metadata@v1.3.5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Wait for PR CI
+        id: ci
+        if: steps.metadata.outputs.package-ecosystem == 'npm'
+        uses: lewagon/wait-on-check-action@v1.2.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30 # seconds
+          running-workflow-name: dependencies # wait for all checks except this one
 
       - name: Auto-merge dependabot PRs
         # Don't merge updates to GitHub Actions versions automatically.
