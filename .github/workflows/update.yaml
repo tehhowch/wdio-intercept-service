@@ -18,23 +18,10 @@ permissions:
 jobs:
   inspect:
     runs-on: ubuntu-latest
+    env:
+        EVENT_CONTEXT: ${{ toJSON(github.event) }}
     steps:
-      - run: echo '${{ github.event.workflow_run.conclusion }}'
-      - run: echo '${{ github.event.workflow_run.user.login }}'
-      - if: github.event.workflow_run.conclusion == 'success'
-        run: echo "workflow run was successful"
-      - if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        run: echo "workflow run was successful (braces)"
-      - if: github.actor == 'dependabot[bot]'
-        run: echo "actor is dependabot[bot]"
-      - if: ${{ github.actor == 'dependabot[bot]' }}
-        run: echo "actor is dependabot[bot] (braces)"
-      - if: github.event.workflow_run.conclusion == 'success' && github.actor == 'dependabot[bot]'
-        run: echo "job conditional satisfied"
-      - if: ${{ github.event.workflow_run.conclusion == 'success' && github.actor == 'dependabot[bot]' }}
-        run: echo "job conditional satisfied (braces)"
-      - if: github.event.pull_request
-        run: echo '${{ github.event.pull_request.html_url }}'
+      - run: echo $EVENT_CONTEXT
 
   dependencies:
     runs-on: ubuntu-latest
