@@ -7,6 +7,13 @@ on:
   pull_request:
 
 jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    env:
+        EVENT_CONTEXT: ${{ toJSON(github.event) }}
+    steps:
+      - run: echo $EVENT_CONTEXT
+
   test:
     runs-on: ubuntu-latest
     steps:
