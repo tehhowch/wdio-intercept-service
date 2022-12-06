@@ -30,7 +30,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 100
+          wait-interval: 30 # seconds
           running-workflow-name: dependencies # wait for all checks except this one
 
       - name: Auto-merge dependabot PRs
